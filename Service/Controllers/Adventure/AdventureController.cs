@@ -1,10 +1,10 @@
 ﻿using Application;
 using Common;
 using Domain;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -15,28 +15,26 @@ namespace Service
     [ApiController]
     public class AdventureController : BaseController
     {
-        private readonly IAdventureApp<string> _adventureApp;
+        private readonly IAdventureApp<DecisionData> _adventureApp;
 
-        public AdventureController(IAdventureApp<string> adventureApp, ILogger<AdventureController> logger)
+        public AdventureController(IAdventureApp<DecisionData> adventureApp, ILogger<AdventureController> logger)
             : base(logger)
         {
             _adventureApp = adventureApp;
         }
 
-        // GET: <AdventureController>
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
+        /// <summary>
+        /// Returns a decision-tree with the specified key.
+        /// </summary>
         // GET <AdventureController>/C4C2E408FEC34AF2B29A4A385B5261A1
         [HttpGet("{key}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Get(string key)
         {
             try
             {
-                DecisionTree<string> decisionTree = await _adventureApp.GetDecisionTree(key);
+                DecisionTree<DecisionData> decisionTree = await _adventureApp.GetDecisionTree(key);
 
                 return Ok(decisionTree);
             }
@@ -50,21 +48,25 @@ namespace Service
             }
         }
 
+        /// <summary>
+        /// Creates an initial decision-tree.
+        /// </summary>
         // POST <AdventureController>
         [HttpPost]
-        public async Task<IActionResult> Post(DecisionTree<string> value)
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        public async Task<IActionResult> Post(DecisionTree<DecisionData> value)
         {
             try
             {
-                string id = await _adventureApp.CreateDecisionTree(value);
+                string key = await _adventureApp.SaveDecisionTree(value);
 
                 // Response model mapping
                 CreationResponseModel responseModel = new()
                 {
-                    Key = id
+                    Key = key
                 };
                 
-                return Created(new Uri($"/adventure/{id}", UriKind.Relative), responseModel);
+                return Created(new Uri($"/adventure/{key}", UriKind.Relative), responseModel);
             }
             catch (ApiException aexp)
             {
@@ -76,16 +78,36 @@ namespace Service
             }
         }
 
-        // PUT api/<AdventureController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        /// <summary>
+        /// Updates a decision-tree with the specified key and choices.
+        /// </summary>
+        // PUT <AdventureController>/C4C2E408FEC34AF2B29A4A385B5261A1
+        [HttpPut("{key}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> Put([FromBody]DecisionTree<DecisionData> value, string key)
         {
+            try
+            {
+                await _adventureApp.SaveDecisionTree(value, key);
+
+                return NoContent();
+            }
+            catch (ApiException aexp)
+            {
+                return HandleApiException(aexp);
+            }
+            catch (Exception ex)
+            {
+                return HandleApiException(ex);
+            }
         }
 
+        /*
         // DELETE api/<AdventureController>/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
         }
+        */
     }
 }

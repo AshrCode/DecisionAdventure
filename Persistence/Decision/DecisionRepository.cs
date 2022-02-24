@@ -1,29 +1,28 @@
 ﻿using Application;
 using Domain;
 using Microsoft.Extensions.Logging;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Persistence
 {
-    public class DecisionRepository : RepositoryBase<DecisionTree<string>>, IDecisionRepo<string>
+    public class DecisionRepository : RepositoryBase<DecisionTree<DecisionData>>, IDecisionRepo<DecisionData>
     {
-        private static IDictionary<string, DecisionTree<string>> _bufferStorage = new ConcurrentDictionary<string, DecisionTree<string>>();
+        //private static IDictionary<string, DecisionTree<DecisionData>> _bufferStorage = new ConcurrentDictionary<string, DecisionTree<DecisionData>>();
 
         public DecisionRepository(ILogger<DecisionRepository> logger)
             : base(logger)
-        { 
-            if(_storage.Count < 1)
+        {
+            if (_storage.Count < 1)
             {
-                KeyValuePair<string, DecisionTree<string>> item = GetSampleDecisionData();
+                KeyValuePair<string, DecisionTree<DecisionData>> item = GetSampleDecisionData();
                 _storage.Add(item);
 
                 _logger.LogInformation("Sample decision tree data has been seeded.");
             }
         }
 
-        public async Task<DecisionTree<string>> GetById(string key)
+        public async Task<DecisionTree<DecisionData>> GetById(string key)
         {
             /*
              * Here, we can add additional db level functionality in future if needed.
@@ -33,7 +32,7 @@ namespace Persistence
         }
 
         // Update capability of the method can be avail in future.
-        public async Task SaveOrUpdate(DecisionTree<string> decisionTree, string key)
+        public async Task SaveOrUpdate(DecisionTree<DecisionData> decisionTree, string key)
         {
             /*
              * Here, we can add additional db level functionality in future if needed.
@@ -42,59 +41,86 @@ namespace Persistence
             await Save(decisionTree, key);
         }
 
-        private static KeyValuePair<string, DecisionTree<string>> GetSampleDecisionData()
+        private static KeyValuePair<string, DecisionTree<DecisionData>> GetSampleDecisionData()
         {
             string id = "9A0FA5F7048544F2A7EFBF066F8AA9A9";
-            DecisionTree<string> decisionTree = new()
+            DecisionTree<DecisionData> decisionTree = new()
             {
-                Root = new DecisionNode<string>
+                Root = new DecisionNode<DecisionData>
                 {
                     // 1st Stage
-                    Data = "Do I want an electric car?",
-                    No = new DecisionNode<string>
+                    Data = new()
                     {
-                        // 2nd Stage
-                        Data = "Maybe you want an apple?"
+                        Title = "Do I want an electric car?"
                     },
-                    Yes = new DecisionNode<string>
+                    No = new DecisionNode<DecisionData>
                     {
                         // 2nd Stage
-                        Data = "Do I desrve it?",
-                        No = new DecisionNode<string>
+                        Data = new()
+                        {
+                            Title = "Maybe you want an apple?"
+                        }
+                    },
+                    Yes = new DecisionNode<DecisionData>
+                    {
+                        // 2nd Stage
+                        Data = new()
+                        {
+                            Title = "Do I desrve it?"
+                        },
+                        No = new DecisionNode<DecisionData>
                         {
                             // 3rd Stage
-                            Data = "Is it a good car?",
-                            No = new DecisionNode<string>
+                            Data = new()
                             {
-                                // Fourth Stage
-                                Data = "Wait till you find a wrost one."
+                                Title = "Is it a good car?"
                             },
-                            Yes = new DecisionNode<string>
+                            No = new DecisionNode<DecisionData>
                             {
                                 // Fourth Stage
-                                Data = "What are you waiting for? Go and get one."
+                                Data = new()
+                                {
+                                    Title = "Wait till you find a wrost one."
+                                }
+                            },
+                            Yes = new DecisionNode<DecisionData>
+                            {
+                                // Fourth Stage
+                                Data = new()
+                                {
+                                    Title = "What are you waiting for? Go and get one."
+                                }
                             }
                         },
-                        Yes = new DecisionNode<string>
+                        Yes = new DecisionNode<DecisionData>
                         {
                             //3rd Stage
-                            Data = "Are you sure?",
-                            No = new DecisionNode<string>
+                            Data = new()
                             {
-                                // Fourth Stage
-                                Data = "Do jumping jack first."
+                                Title = "Are you sure?"
                             },
-                            Yes = new DecisionNode<string>
+                            No = new DecisionNode<DecisionData>
                             {
                                 // Fourth Stage
-                                Data = "Get it."
+                                Data = new()
+                                {
+                                    Title = "Do jumping jack first."
+                                }
+                            },
+                            Yes = new DecisionNode<DecisionData>
+                            {
+                                // Fourth Stage
+                                Data = new()
+                                {
+                                    Title = "Get it."
+                                }
                             }
                         }
                     }
                 }
             };
 
-            var item = new KeyValuePair<string, DecisionTree<string>>(id, decisionTree);
+            var item = new KeyValuePair<string, DecisionTree<DecisionData>>(id, decisionTree);
 
             return item;
         }

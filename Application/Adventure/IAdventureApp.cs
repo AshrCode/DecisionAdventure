@@ -7,6 +7,6 @@ namespace Application
     {
         Task<DecisionTree<T>> GetDecisionTree(string key);
 
-        Task<string> CreateDecisionTree(DecisionTree<T> decisionTree);
+        Task<string> SaveDecisionTree(DecisionTree<T> decisionTree, string key = null);
     }
 }

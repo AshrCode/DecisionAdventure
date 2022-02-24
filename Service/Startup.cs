@@ -1,4 +1,5 @@
 using Application;
+using Domain;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -35,10 +36,10 @@ namespace Service
             });
 
             // Applications
-            services.AddScoped<IAdventureApp<string>, AdventureApp>();
+            services.AddScoped<IAdventureApp<DecisionData>, AdventureApp>();
 
             // Persistence
-            services.AddScoped<IDecisionRepo<string>, DecisionRepository>();
+            services.AddScoped<IDecisionRepo<DecisionData>, DecisionRepository>();
             
         }
 

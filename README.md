@@ -10,3 +10,5 @@ The application will have a few pages.
 and persist the path they took.
 3. A “Decision tree” page that shows the result of the adventure with highlighted choices
 that the user has made in their story.
+
+Swagger can be accessed at http://localhost:[port]/swagger/index.html

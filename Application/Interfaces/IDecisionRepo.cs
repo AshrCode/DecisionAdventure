@@ -7,6 +7,8 @@ namespace Application
     {
         Task<DecisionTree<T>> GetById(string key);
 
-        Task SaveOrUpdate(DecisionTree<T> decisionTree, string key);
+        Task AddDecision(DecisionTree<T> decisionTree, string key);
+
+        Task UpdateDecision(DecisionTree<T> decisionTree, string key);
     }
 }

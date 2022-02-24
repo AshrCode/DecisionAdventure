@@ -6,6 +6,12 @@ namespace Persistence
     {
         Task<T> Get(string id);
 
-        Task Save(T element, string id);
+        Task SaveOrUpdate(T element, string id);
+
+        Task Save(T element, string key);
+
+        Task Update(T element, string key);
+
+
     }
 }

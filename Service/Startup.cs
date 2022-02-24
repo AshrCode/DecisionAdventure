@@ -35,6 +35,12 @@ namespace Service
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Service", Version = "v1" });
             });
 
+            services.AddMvc()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+                });
+
             // Applications
             services.AddScoped<IAdventureApp<DecisionData>, AdventureApp>();
 

@@ -8,15 +8,14 @@ namespace Persistence
 {
     public class DecisionRepository : RepositoryBase<DecisionTree<DecisionData>>, IDecisionRepo<DecisionData>
     {
-        //private static IDictionary<string, DecisionTree<DecisionData>> _bufferStorage = new ConcurrentDictionary<string, DecisionTree<DecisionData>>();
-
         public DecisionRepository(ILogger<DecisionRepository> logger)
             : base(logger)
         {
             if (_storage.Count < 1)
             {
-                KeyValuePair<string, DecisionTree<DecisionData>> item = GetSampleDecisionData();
-                _storage.Add(item);
+                // Seeding sample data.
+                List<KeyValuePair<string, DecisionTree<DecisionData>>> items = GetSampleDecisionData();
+                items.ForEach(x => _storage.Add(x.Key, x.Value));
 
                 _logger.LogInformation("Sample decision tree data has been seeded.");
             }
@@ -25,26 +24,37 @@ namespace Persistence
         public async Task<DecisionTree<DecisionData>> GetById(string key)
         {
             /*
-             * Here, we can add additional db level functionality in future if needed.
+             * Here, we can add additional repository level functionality in future if needed.
              */
 
             return await Get(key);
         }
 
-        // Update capability of the method can be avail in future.
-        public async Task SaveOrUpdate(DecisionTree<DecisionData> decisionTree, string key)
+        public async Task AddDecision(DecisionTree<DecisionData> decisionTree, string key)
         {
             /*
-             * Here, we can add additional db level functionality in future if needed.
+             * Here, we can add additional repository level functionality in future if needed.
              */
 
             await Save(decisionTree, key);
         }
-
-        private static KeyValuePair<string, DecisionTree<DecisionData>> GetSampleDecisionData()
+        
+        public async Task UpdateDecision(DecisionTree<DecisionData> decisionTree, string key)
         {
-            string id = "9A0FA5F7048544F2A7EFBF066F8AA9A9";
-            DecisionTree<DecisionData> decisionTree = new()
+            /*
+             * Here, we can add additional repository level functionality in future if needed.
+             */
+
+            await Update(decisionTree, key);
+        }
+
+        private static List<KeyValuePair<string, DecisionTree<DecisionData>>> GetSampleDecisionData()
+        {
+            List<KeyValuePair<string, DecisionTree<DecisionData>>> items = new();
+
+            // Sample Data 1
+            string sampleKey1 = "9A0FA5F7048544F2A7EFBF066F8AA9A9";
+            DecisionTree<DecisionData> sampleDecisionTree1 = new()
             {
                 Root = new DecisionNode<DecisionData>
                 {
@@ -119,10 +129,25 @@ namespace Persistence
                     }
                 }
             };
+            var sampleData1 = new KeyValuePair<string, DecisionTree<DecisionData>>(sampleKey1, sampleDecisionTree1);
+            items.Add(sampleData1);
 
-            var item = new KeyValuePair<string, DecisionTree<DecisionData>>(id, decisionTree);
+            // Sample Data 2
+            string sampleKey2 = "TEST_Key";
+            DecisionTree<DecisionData> sampleDecisionTree2 = new()
+            {
+                Root = new DecisionNode<DecisionData>
+                {
+                    Data = new DecisionData
+                    {
+                        Title = "Sample Title 2"
+                    }
+                }
+            };
+            var sampleData2 = new KeyValuePair<string, DecisionTree<DecisionData>>(sampleKey2, sampleDecisionTree2);
+            items.Add(sampleData2);
 
-            return item;
+            return items;
         }
     }
 }

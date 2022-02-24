@@ -54,11 +54,12 @@ namespace Service
         // POST <AdventureController>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> Post(DecisionTree<DecisionData> value)
         {
             try
             {
-                string key = await _adventureApp.SaveDecisionTree(value);
+                string key = await _adventureApp.AddDecisionTree(value);
 
                 // Response model mapping
                 CreationResponseModel responseModel = new()
@@ -84,11 +85,12 @@ namespace Service
         // PUT <AdventureController>/C4C2E408FEC34AF2B29A4A385B5261A1
         [HttpPut("{key}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Put([FromBody]DecisionTree<DecisionData> value, string key)
         {
             try
             {
-                await _adventureApp.SaveDecisionTree(value, key);
+                await _adventureApp.UpdateDecisionTree(value, key);
 
                 return NoContent();
             }
@@ -101,13 +103,5 @@ namespace Service
                 return HandleApiException(ex);
             }
         }
-
-        /*
-        // DELETE api/<AdventureController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
-        */
     }
 }

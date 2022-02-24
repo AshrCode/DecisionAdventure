@@ -33,25 +33,35 @@ namespace Application
             return decisionTree;
         }
 
-        public async Task<string> SaveDecisionTree(DecisionTree<DecisionData> decisionTree, string key = null)
+        public async Task<string> AddDecisionTree(DecisionTree<DecisionData> decisionTree)
         {
-            if (key is null)
-                key = Guid.NewGuid().ToString("N");
+            string key = Guid.NewGuid().ToString("N");
 
-            // Add or update
-            await _decisionRepo.SaveOrUpdate(decisionTree, key);
+            // Add to storage
+            await _decisionRepo.AddDecision(decisionTree, key);
 
             return key;
         }
 
-        public async Task<DecisionTree<DecisionData>> GetUserDecision(DecisionTree<DecisionData> decisionTree)
+        public async Task<string> UpdateDecisionTree(DecisionTree<DecisionData> decisionTree, string key = null)
+        {
+            // Update to storage
+            await _decisionRepo.UpdateDecision(decisionTree, key);
+
+            return key;
+        }
+
+        // Can be used to build a Decision tree that only contains the nodes based on user choices.
+        #region Additional
+
+        public Task<DecisionTree<DecisionData>> GetUserDecision(DecisionTree<DecisionData> decisionTree)
         {
             DecisionTree<DecisionData> userDecisionTree = new()
             {
                 Root = TraverseInPreorder(decisionTree.Root)
             };
 
-            return userDecisionTree;
+            return Task.FromResult(userDecisionTree);
         }
 
         private DecisionNode<DecisionData> TraverseInPreorder(DecisionNode<DecisionData> node)
@@ -59,7 +69,8 @@ namespace Application
             if (node is null)
                 return null;
 
-            if (node.Data.IsSelected)
+            if (node.Data.IsSelected.HasValue
+                && node.Data.IsSelected.Value)
                 return node;
 
             TraverseInPreorder(node.Yes);
@@ -67,5 +78,7 @@ namespace Application
 
             return null;
         }
+
+        #endregion
     }
 }
